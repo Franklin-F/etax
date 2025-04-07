@@ -5,12 +5,11 @@ import corpwechatbot
 
 
 corpwechatbot.app.TOKEN_PATH = Path(settings.TEMPORARY_TOKEN_JSON)
-wecom = corpwechatbot.app.AppMsgSender(
-    corpid=settings.WECOM_CORPID,
-    corpsecret=settings.WECOM_CORPSECRET,
-    agentid=settings.WECOM_AGENTID,
-)
-
-
+# wecom = corpwechatbot.app.AppMsgSender(
+#     corpid=settings.WECOM_CORPID,
+#     corpsecret=settings.WECOM_CORPSECRET,
+#     agentid=settings.WECOM_AGENTID,
+# )
+wecom = None
 if __name__ == '__main__':
     fire.Fire()

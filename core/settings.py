@@ -17,7 +17,7 @@ from pathlib import Path
 # 创建实例env，管理环境变量
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False),
+    DEBUG=(bool, True),
     CRM_PORT=(int, None),
 )
 # 动态地获取 Django 项目的根目录，并将其赋值给变量 BASE_DIR。在后续的配置中，BASE_DIR 会被广泛用于构建其他文件和目录的路径。
@@ -179,21 +179,21 @@ REST_FRAMEWORK = {  # DRF配置
 CRM_HOST = env('CRM_HOST', default='localhost')
 CRM_PORT = env('CRM_PORT', default=8080)
 CRM_PROTOCOL = env('CRM_PROTOCOL', default='http')
-#
-# # corpwechatbot 企业微信机器人配置
-#
+
+# corpwechatbot 企业微信机器人配置
+
 # WECOM_CORPID = env('WECOM_CORPID')
 # WECOM_CORPSECRET = env('WECOM_CORPSECRET')
 # WECOM_AGENTID = env('WECOM_AGENTID')
-#
-# # QUEUE
-#
-# QUEUE_URL = env('QUEUE_URL', default='amqp://guest:guest@localhost:5672/')
-#
-# # 临时token文件
-# TEMPORARY_TOKEN_JSON = env('TEMPORARY_TOKEN_JSON', default='/tmp/token.json')
-#
-# # host地址
-#
-# TEST_HOST = env('TEST_HOST', default='http://etax.test.zxwy123.com:81/')
-# PROD_HOST = env('PROD_HOST', default='https://etax.zxwy123.com:444/')
+
+# QUEUE
+
+QUEUE_URL = env('QUEUE_URL', default='amqp://guest:guest@localhost:5672/')
+
+# 临时token文件
+TEMPORARY_TOKEN_JSON = env('TEMPORARY_TOKEN_JSON', default='/tmp/token.json')
+
+# host地址
+
+TEST_HOST = env('TEST_HOST', default='http://etax.test.zxwy123.com:81/')
+PROD_HOST = env('PROD_HOST', default='https://etax.zxwy123.com:444/')

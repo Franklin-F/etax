@@ -5,12 +5,12 @@ from functools import partial
 from lib.logger import logger
 from lib.attrdict import AttrDict
 from lib.days import *
-from lib.agent.bureau import Bureau, login_dppt_decorator
+from lib.agent.bureau import Bureau, login_dppt_decorator, login_new_etax_decorator, login_new_dppt_decorator
 
 
 class GetInvoice(Bureau):
 
-    @partial(login_dppt_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/invoice-query/invoice-query')
+    @partial(login_new_dppt_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/invoice-query/invoice-query')
     def download_invoice(self, mode='all', begin_date=None, end_date=None):
         output = []
         if mode in ['all', 'out']:
@@ -23,7 +23,7 @@ class GetInvoice(Bureau):
             input = list(self.download_invoice_filedata(mode='in', begin_date=begin_date, end_date=end_date))
         return {'out': output, 'in': input}
 
-    @partial(login_dppt_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/invoice-query/invoice-query')
+    @partial(login_new_etax_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/invoice-query/invoice-query')
     def get_invoice_file(self, mode='all', begin_date=None, end_date=None):
         logger.debug(f'{self} {mode} {begin_date} {end_date}')
         output = None
@@ -58,7 +58,7 @@ class GetInvoice(Bureau):
         else:
             logger.info(f'No in invoice')
 
-    @partial(login_dppt_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/invoice-query/invoice-query')
+    @partial(login_new_etax_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/invoice-query/invoice-query')
     def get_invoice(self, mode='all', begin_date=None, end_date=None):
         logger.debug(f'{self} {mode} {begin_date} {end_date}')
         output = []

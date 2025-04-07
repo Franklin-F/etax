@@ -16,7 +16,7 @@ from lib.property import attrs, flags
 from lib.base import BaseModel
 from lib.days import *
 from agent.inner import crm
-
+from .fields import MediumTextField
 
 class BaseLogin(BaseModel):
     name = models.CharField(max_length=256)
@@ -26,6 +26,7 @@ class BaseLogin(BaseModel):
     result = models.JSONField(blank=True, null=True)
     errcode = models.PositiveIntegerField(default=0)
     errmsg = models.CharField(max_length=512, default='')
+    auth_state = MediumTextField(blank=True, null=True)
 
     process_times = attrs()
     priority = attrs()
@@ -127,7 +128,6 @@ class BaseLogin(BaseModel):
                 time.sleep(random.random() * 3)
                 self.reprocess()
                 return
-
         self.status = self.STATUS_DOING
         process_times = self.process_times or 0
         self.process_times = process_times + 1
@@ -216,7 +216,7 @@ class Login(BaseLogin):
             screenshot_dir=self.screenshot_dir,
             download_dir=self.download_dir,
         )
-        return agent.login()
+        return agent.login_with_auth_state(auth_state=self.auth_state)
 
     def get_data(self):
         from .serializers import LoginDetailSerializer
@@ -268,7 +268,7 @@ class GetInvoice(BaseLogin):
             screenshot_dir=self.screenshot_dir,
             download_dir=self.download_dir,
         )
-        return agent.get_invoice(self.mode, self.begin_date, self.end_date)
+        return agent.get_invoice(self.mode, self.begin_date, self.end_date, auth_state=self.auth_state)
 
     def get_data(self):
         from .serializers import GetInvoiceDetailSerializer
@@ -311,7 +311,7 @@ class DownloadInvoice(BaseLogin):
             screenshot_dir=self.screenshot_dir,
             download_dir=self.download_dir,
         )
-        result = agent.download_invoice(self.mode, self.begin_date, self.end_date)
+        result = agent.download_invoice(self.mode, self.begin_date, self.end_date, auth_state=self.auth_state)
         for item in itertools.chain(result['in'], result['out']):
             if item["invoice_pdf"]:
                 filepath = os.path.join(self.download_dir, item["invoice_pdf"])
@@ -412,7 +412,7 @@ class GetDeduction(BaseLogin):
             screenshot_dir=self.screenshot_dir,
             download_dir=self.download_dir,
         )
-        return agent.get_deduction(self.period)
+        return agent.get_deduction(self.period, auth_state=self.auth_state)
 
     def get_data(self):
         from .serializers import GetDeductionDetailSerializer
@@ -430,7 +430,7 @@ class GetCurrentDeduction(BaseLogin):
             screenshot_dir=self.screenshot_dir,
             download_dir=self.download_dir,
         )
-        return agent.get_current_deduction()
+        return agent.get_current_deduction(auth_state=self.auth_state)
 
     def get_data(self):
         from .serializers import GetCurrentDeductionDetailSerializer
@@ -449,7 +449,7 @@ class FileVat(BaseLogin):
             download_dir=self.download_dir,
         )
 
-        return agent.file_vat()
+        return agent.file_vat(auth_state=self.auth_state)
 
     @property
     def vat_screenshots(self):
@@ -564,7 +564,9 @@ class Invoicing(BaseLogin):
                                reduced_tax=self.reduced_tax,
                                invoice_data=self.invoice_data,
                                remark=self.remark,
-                               submit=True)
+                               submit=True,
+                               auth_state=self.auth_state,
+                               )
 
     def get_data(self):
         from .serializers import InvoicingSerializer

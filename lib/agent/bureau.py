@@ -1,3 +1,5 @@
+import json
+import time
 import traceback
 import urllib.parse
 from collections import defaultdict
@@ -174,7 +176,20 @@ class Bureau(Browser):
 
             self.new_context()
 
-
+    def login_with_auth_state(self,name=None,
+              credit_id=None,
+              user_id=None, auth_state=None,client_id=None, redirect_uri=None):
+        self.name = name or self.name
+        self.credit_id = credit_id or self.credit_id
+        self.user_id = user_id or self.user_id
+        if isinstance(auth_state, str):
+            auth_state = json.loads(auth_state)
+        self._context = self.browser.new_context(storage_state=auth_state)
+        self.page = self._context.new_page()
+        logger.debug(f'login_with_auth_state {self.name} {ETAX_HOMEPAGE} {auth_state}')
+        self.page.goto(ETAX_HOMEPAGE)
+        logger.debug(f'login_with_auth_state END')
+        return {"status": "success", "message": "Auth state loaded successfully."}
 
     def drag_box(self):
         track = self.page.wait_for_selector(".drag")
@@ -384,6 +399,46 @@ def login_decorator(fun, client_id, redirect_uri):
 
     return ret_fun
 
+def login_with_state_decorator(fun, client_id, redirect_uri):
+    @wraps(fun)
+    def wrapped(self, *args, **kwargs):
+        auth_state = kwargs.pop('auth_state', None)
+        logger.debug(f"[LOGIN] 登录装饰器被调用: {self.name} {auth_state}")
+        try:
+            if auth_state:
+                logger.debug(f"[LOGIN] 使用 auth_state 登录: {self.name}")
+                self.login_with_auth_state(
+                    client_id=client_id,
+                    redirect_uri=redirect_uri,
+                    auth_state=auth_state
+                )
+                self.wait(500)
+                self.screenshot('fail_auth_state')
+            else:
+                #原来的登录保留
+                if not getattr(self, '_has_login', False):
+                    logger.debug(f"[LOGIN] 未登录，开始 login")
+                    self.login(client_id=client_id, redirect_uri=redirect_uri)
+                elif not getattr(self, 'page', None) or redirect_uri not in self.page.url:
+                    logger.debug(f"[LOGIN] 页面未就绪或跳转失效，重新 login")
+                    self.login(client_id=client_id, redirect_uri=redirect_uri)
+
+        except Exception as e:
+            logger.error(f"[LOGIN STATE ERROR] 登录异常: {e}")
+            raise
+
+        for i in range(2):
+            try:
+                return fun(self, *args, **kwargs)
+            except NeedLoginError:
+                logger.warning(f"[LOGIN RETRY] NeedLoginError 第 {i+1} 次触发重新登录")
+                self.login(client_id=client_id, redirect_uri=redirect_uri)
+            except StopError as err:
+                logger.error(f"[STOP ERROR] {err}")
+                self.wait(500)
+                self.screenshot('fail')
+                raise err
+    return wrapped
 
 login_dppt_decorator = partial(login_decorator,
     client_id=DPPT_CLIENT_ID,
@@ -391,6 +446,16 @@ login_dppt_decorator = partial(login_decorator,
 )
 
 login_etax_decorator = partial(login_decorator,
+    client_id=ETAX_CLIENT_ID,
+    redirect_uri=ETAX_HOMEPAGE,
+)
+login_new_dppt_decorator = partial(
+    login_with_state_decorator,
+    client_id=DPPT_CLIENT_ID,
+    redirect_uri=DPPT_HOMEPAGE,
+)
+login_new_etax_decorator = partial(
+    login_with_state_decorator,
     client_id=ETAX_CLIENT_ID,
     redirect_uri=ETAX_HOMEPAGE,
 )

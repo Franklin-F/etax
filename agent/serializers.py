@@ -5,7 +5,8 @@ from agent.models import *
 class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = Login
-        fields = ['id', 'name', 'credit_id', 'user_id', 'password', 'status', 'addtime']
+        fields = ['id', 'name', 'credit_id', 'user_id', 'password', 'status', 'addtime',
+            'auth_state']
         read_only_fields = ('status', 'addtime')
         extra_kwargs = {
             'password': {'write_only': True}
@@ -13,7 +14,6 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class LoginDetailSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = Login
         fields = [
@@ -45,7 +45,6 @@ class GetInvoiceDetailSerializer(serializers.ModelSerializer):
 
 
 class DownloadInvoiceSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = DownloadInvoice
         fields = [
@@ -59,7 +58,6 @@ class DownloadInvoiceSerializer(serializers.ModelSerializer):
 
 
 class DownloadInvoiceDetailSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = DownloadInvoice
         fields = [
@@ -67,10 +65,8 @@ class DownloadInvoiceDetailSerializer(serializers.ModelSerializer):
             'status', 'result', 'addtime', 'errcode', 'errmsg', 'auth_state'
         ]
 
-
 class GetInvoiceFileSerializer(serializers.ModelSerializer):
     begin_date = serializers.DateField(format='%Y-%m-%d')
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = GetInvoiceFile
         fields = [
@@ -84,7 +80,6 @@ class GetInvoiceFileSerializer(serializers.ModelSerializer):
 
 
 class GetInvoiceFileDetailSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = GetInvoiceFile
         fields = [
@@ -94,7 +89,6 @@ class GetInvoiceFileDetailSerializer(serializers.ModelSerializer):
 
 
 class GetDeductionSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = GetDeduction
         fields = [
@@ -107,7 +101,6 @@ class GetDeductionSerializer(serializers.ModelSerializer):
 
 
 class GetDeductionDetailSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = GetDeduction
         fields = [
@@ -116,7 +109,6 @@ class GetDeductionDetailSerializer(serializers.ModelSerializer):
 
 
 class GetCurrentDeductionSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = GetCurrentDeduction
         fields = [
@@ -129,7 +121,6 @@ class GetCurrentDeductionSerializer(serializers.ModelSerializer):
 
 
 class GetCurrentDeductionDetailSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = GetCurrentDeduction
         fields = [
@@ -139,7 +130,6 @@ class GetCurrentDeductionDetailSerializer(serializers.ModelSerializer):
 
 
 class FileVatSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = FileVat
         fields = [
@@ -152,7 +142,6 @@ class FileVatSerializer(serializers.ModelSerializer):
 
 
 class FileVatDetailSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = FileVat
         fields = [
@@ -202,7 +191,6 @@ class FileCitDetailSerializer(serializers.ModelSerializer):
 
 
 class RevokeTaxSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = RevokeTax
         fields = [
@@ -215,7 +203,6 @@ class RevokeTaxSerializer(serializers.ModelSerializer):
 
 
 class RevokeTaxDetailSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = RevokeTax
         fields = [
@@ -225,7 +212,6 @@ class RevokeTaxDetailSerializer(serializers.ModelSerializer):
 
 
 class InvoicingSerializer(serializers.ModelSerializer):
-    auth_state = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = Invoicing
         fields = [

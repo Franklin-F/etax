@@ -32,7 +32,7 @@ class Browser:
         self.credit_id = credit_id
         self.user_id = user_id
         self.password = password
-        self.browser_type = browser_type or 'firefox'
+        self.browser_type = browser_type or 'chromium' # 'firefox'
 
         self.headless = headless
         if self.headless is None:
@@ -82,14 +82,17 @@ class Browser:
     @property
     def browser(self):
         if self._browser is None:
-            self._browser = getattr(self.playwright, self.browser_type).launch(headless=self.headless)
+            self._browser = getattr(self.playwright, self.browser_type).launch(
+                headless=self.headless,
+                args=["--disable-blink-features=AutomationControlled"],
+            )
             logger.debug('playwright new browser')
         return self._browser
 
     @property
     def context(self):
         if self._context is None:
-            self._context = self.browser.new_context(locale="zh-CN", storage_state=r'C:\Users\pc\Desktop\91120221MA06DLX78N.json')
+            self._context = self.browser.new_context(locale="zh-CN")
             logger.debug('playwright new context')
         return self._context
 

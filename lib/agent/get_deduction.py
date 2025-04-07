@@ -5,7 +5,7 @@ from functools import partial
 from lib.logger import logger
 from lib.days import *
 from lib.attrdict import AttrDict
-from lib.agent.bureau import Bureau, login_dppt_decorator, StopError, MonthInvalid
+from lib.agent.bureau import Bureau, login_dppt_decorator, StopError, MonthInvalid, login_new_etax_decorator, login_new_dppt_decorator
 
 
 class DeductionError(StopError):
@@ -30,7 +30,7 @@ class DeductionEtaxUserError(StopError):
 
 class GetDeduction(Bureau):
 
-    @partial(login_dppt_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/dedeuction-type-checked-business')
+    @partial(login_new_etax_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/dedeuction-type-checked-business')
     def get_deduction(self, period=None):
         return [d.to_dict() for d in self.gen_deduction(period)]
 
@@ -120,7 +120,7 @@ class GetDeduction(Bureau):
                 if 'Response' in data:
                     yield from data.Response.Data.fpxx.List
 
-    @partial(login_dppt_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/dedeuction-type-checked-business')
+    @partial(login_new_dppt_decorator, redirect_uri='https://dppt.tianjin.chinatax.gov.cn:8443/dedeuction-type-checked-business')
     def get_current_deduction(self):
         return [d.to_dict() for d in self.gen_current_deduction()]
 
